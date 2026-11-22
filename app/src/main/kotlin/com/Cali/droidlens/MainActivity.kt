@@ -1,12 +1,16 @@
 package com.Cali.droidlens
 
 import android.app.Activity
+import android.content.ClipData
+import android.content.ClipboardManager
+import android.content.Context
 import android.content.Intent
 import android.os.Bundle
 import android.view.View
 import android.view.animation.DecelerateInterpolator
 import android.widget.Button
 import android.widget.TextView
+import android.widget.Toast
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.appcompat.app.AppCompatActivity
 import com.google.android.material.button.MaterialButton
@@ -20,6 +24,7 @@ class MainActivity : AppCompatActivity() {
     private lateinit var tvFileMeta: TextView
     private lateinit var tvStatus: TextView
     private lateinit var resultsContainer: View
+    private lateinit var btnOpenTutorial: MaterialButton
 
     // Overview
     private lateinit var tvAppLabel: TextView
@@ -119,6 +124,26 @@ class MainActivity : AppCompatActivity() {
     private lateinit var tvFingerprintToggle: TextView
     private var fingerprintExpanded = false
 
+    // KernelSU & Root Scope
+    private lateinit var cardKernelSu: MaterialCardView
+    private lateinit var headerKernelSu: View
+    private lateinit var scrollKernelSu: View
+    private lateinit var tvKsuSummary: TextView
+    private lateinit var tvKsuToggle: TextView
+    private lateinit var tvKsuBreakdown: TextView
+    private lateinit var tvKsuScripts: TextView
+    private lateinit var tvKsuDex: TextView
+    private lateinit var tvKsuNative: TextView
+    private lateinit var btnCopyStraceCmd: MaterialButton
+    private lateinit var btnRunStrace: MaterialButton
+    private lateinit var tvStraceResults: TextView
+    private lateinit var tvKsuJson: TextView
+    private lateinit var btnCopyKsuJson: MaterialButton
+    private var ksuExpanded = false
+    private var currentKsuJson = ""
+    private var currentStraceCmd = ""
+    private var currentPackageId = ""
+
     // Raw manifest
     private lateinit var headerRawManifest: View
     private lateinit var scrollRawManifest: View
@@ -204,9 +229,21 @@ class MainActivity : AppCompatActivity() {
             }
             startActivity(intent)
         }
+
+        btnOpenTutorial.setOnClickListener {
+            startActivity(Intent(this, TutorialActivity::class.java))
+        }
+
+        // Show tutorial on first launch
+        val prefs = getSharedPreferences("droidlens_prefs", Context.MODE_PRIVATE)
+        if (prefs.getBoolean("first_run_tutorial", true)) {
+            prefs.edit().putBoolean("first_run_tutorial", false).apply()
+            startActivity(Intent(this, TutorialActivity::class.java))
+        }
     }
 
     private fun bindViews() {
+        btnOpenTutorial = findViewById<MaterialButton>(R.id.btnOpenTutorial)
         tvFileName = findViewById<TextView>(R.id.tvFileName)
         tvFileMeta = findViewById<TextView>(R.id.tvFileMeta)
         tvStatus = findViewById<TextView>(R.id.tvStatus)
@@ -282,6 +319,22 @@ class MainActivity : AppCompatActivity() {
         tvFingerprint = findViewById<TextView>(R.id.tvFingerprint)
         tvFingerprintToggle = findViewById<TextView>(R.id.tvFingerprintToggle)
 
+        // KernelSU views
+        cardKernelSu = findViewById<MaterialCardView>(R.id.cardKernelSu)
+        headerKernelSu = findViewById<View>(R.id.headerKernelSu)
+        scrollKernelSu = findViewById<View>(R.id.scrollKernelSu)
+        tvKsuSummary = findViewById<TextView>(R.id.tvKsuSummary)
+        tvKsuToggle = findViewById<TextView>(R.id.tvKsuToggle)
+        tvKsuBreakdown = findViewById<TextView>(R.id.tvKsuBreakdown)
+        tvKsuScripts = findViewById<TextView>(R.id.tvKsuScripts)
+        tvKsuDex = findViewById<TextView>(R.id.tvKsuDex)
+        tvKsuNative = findViewById<TextView>(R.id.tvKsuNative)
+        btnCopyStraceCmd = findViewById<MaterialButton>(R.id.btnCopyStraceCmd)
+        btnRunStrace = findViewById<MaterialButton>(R.id.btnRunStrace)
+        tvStraceResults = findViewById<TextView>(R.id.tvStraceResults)
+        tvKsuJson = findViewById<TextView>(R.id.tvKsuJson)
+        btnCopyKsuJson = findViewById<MaterialButton>(R.id.btnCopyKsuJson)
+
         headerRawManifest = findViewById<View>(R.id.headerRawManifest)
         scrollRawManifest = findViewById<View>(R.id.scrollRawManifest)
         tvOutput = findViewById<TextView>(R.id.tvOutput)
@@ -324,9 +377,35 @@ class MainActivity : AppCompatActivity() {
             animateReveal(scrollRawManifest, manifestExpanded)
             rotateToggle(tvManifestToggle, manifestExpanded)
         }
+        headerKernelSu.setOnClickListener {
+            ksuExpanded = !ksuExpanded
+            animateReveal(scrollKernelSu, ksuExpanded)
+            rotateToggle(tvKsuToggle, ksuExpanded)
+        }
     }
 
     private fun setupShowAllButtons() {
+        btnCopyKsuJson.setOnClickListener {
+            if (currentKsuJson.isNotBlank()) {
+                val clipboard = getSystemService(Context.CLIPBOARD_SERVICE) as ClipboardManager
+                val clip = ClipData.newPlainText("KernelSU App Profile", currentKsuJson)
+                clipboard.setPrimaryClip(clip)
+                Toast.makeText(this, "KernelSU Profile JSON copied to clipboard", Toast.LENGTH_SHORT).show()
+            }
+        }
+        btnCopyStraceCmd.setOnClickListener {
+            if (currentStraceCmd.isNotBlank()) {
+                val clipboard = getSystemService(Context.CLIPBOARD_SERVICE) as ClipboardManager
+                val clip = ClipData.newPlainText("Strace Command", currentStraceCmd)
+                clipboard.setPrimaryClip(clip)
+                Toast.makeText(this, "Strace command copied to clipboard", Toast.LENGTH_SHORT).show()
+            }
+        }
+        btnRunStrace.setOnClickListener {
+            if (currentPackageId.isNotBlank()) {
+                runLiveStrace(currentPackageId)
+            }
+        }
         btnSecretsShowAll.setOnClickListener {
             secretsShowAll = !secretsShowAll
             swapText(tvSecrets, if (secretsShowAll) secretsFull else secretsPreview)
@@ -540,6 +619,40 @@ val permissionsPreviewText = if (info.permissions.isEmpty()) "—"
     else info.permissions.joinToString("\n") { "• $it" }
 val permissionsFullText = permissionsPreviewText
 
+// ═══ KernelSU & Root Capability Scope ═══
+runOnUiThread { tvStatus.text = "Inspecting root & privileged capabilities…" }
+val scriptSummary = try {
+    RootScriptExtractor.scan(apk)
+} catch (e: Throwable) {
+    RootScriptExtractor.Summary(emptyList(), 0, 0, emptySet(), emptySet(), false, e.message)
+}
+
+val elfSummary = try {
+    ElfSymbolParser.scan(apk)
+} catch (e: Throwable) {
+    ElfSymbolParser.Summary(emptyList(), 0, emptySet(), emptySet(), e.message)
+}
+
+val dexRootSummary = try {
+    DexRootScanner.scan(apk, secrets.strings.ifEmpty { null })
+} catch (e: Throwable) {
+    DexRootScanner.Summary(emptyList(), emptyList(), emptyList(), emptySet(), e.message)
+}
+
+val ksuProfileScope = KernelSuProfileGenerator.generate(
+    KernelSuProfileGenerator.SynthesisInput(
+        packageId = info.packageName,
+        appLabel = info.appLabel,
+        scriptSummary = scriptSummary,
+        elfSummary = elfSummary,
+        dexSummary = dexRootSummary
+    )
+)
+
+val ksuFindings = KernelSuProfileGenerator.toFindings(ksuProfileScope)
+val a16Findings = mutableListOf<FindingsEngine.Finding>()
+FindingsEngine.check16KbPageAlignment(elfSummary.non16KbLibs, a16Findings)
+
 // ═══ Findings ═══
 val baseFindings: List<FindingsEngine.Finding> = if (fp != null) {
     try {
@@ -551,7 +664,7 @@ val baseFindings: List<FindingsEngine.Finding> = if (fp != null) {
     emptyList()
 }
 
-val findings = (baseFindings + nativeFindings + flutterFindings)
+val findings = (baseFindings + nativeFindings + flutterFindings + ksuFindings + a16Findings)
     .sortedBy { it.severity.ordinal }
 
 val findingsPreviewText = formatFindingsPreview(findings, 5)
@@ -679,10 +792,34 @@ val findingsFullText = FindingsEngine.format(findings)
                     // Fingerprint
                     tvFingerprint.text = fingerprintText
 
+                    // KernelSU & Root Scope
+                    this.currentPackageId = info.packageName
+                    this.currentKsuJson = ksuProfileScope.jsonString
+                    this.currentStraceCmd = SyscallTraceParser.generateStraceCommand(info.packageName)
+
+                    tvKsuSummary.text = if (ksuProfileScope.hasRootUsage) {
+                        val caps = if (ksuProfileScope.capabilities.isEmpty()) "DAC fallback" else ksuProfileScope.capabilities.joinToString(", ")
+                        "Root detected · Namespace: ${ksuProfileScope.namespace} · Caps: $caps"
+                    } else {
+                        "Unprivileged · Standard Android sandbox (no root operations detected)"
+                    }
+
+                    tvKsuBreakdown.text = KernelSuProfileGenerator.formatBreakdownTable(ksuProfileScope)
+                    tvKsuScripts.text = RootScriptExtractor.format(scriptSummary)
+                    tvKsuDex.text = DexRootScanner.format(dexRootSummary)
+                    tvKsuNative.text = ElfSymbolParser.format(elfSummary)
+                    tvKsuJson.text = ksuProfileScope.jsonString
+
                     // Raw manifest
                     tvOutput.text = xmlText
 
                     // Reset collapsibles
+                    ksuExpanded = false
+                    scrollKernelSu.visibility = View.GONE
+                    scrollKernelSu.alpha = 1f
+                    tvKsuToggle.text = "▸"
+                    tvStraceResults.visibility = View.GONE
+
                     secretsExpanded = false
                     scrollSecrets.visibility = View.GONE
                     scrollSecrets.alpha = 1f
@@ -761,6 +898,53 @@ val findingsFullText = FindingsEngine.format(findings)
                 tvFuzzResults.text = summary
                 btnRunFuzzer.isEnabled = true
                 btnRunFuzzer.text = "Run Intent Fuzzer (Shizuku)"
+            }
+        }.start()
+    }
+
+    private fun runLiveStrace(packageName: String) {
+        tvStraceResults.visibility = View.VISIBLE
+        tvStraceResults.text = "Checking process PID and environment…"
+        btnRunStrace.isEnabled = false
+
+        Thread {
+            if (!ShizukuManager.isReady) {
+                runOnUiThread {
+                    tvStraceResults.text = "Shizuku is not running.\nTo trace child processes, execute in root shell (Termux/ADB):\n\n$currentStraceCmd"
+                    btnRunStrace.isEnabled = true
+                }
+                return@Thread
+            }
+
+            val (pidOut, _) = ShizukuManager.execShell(arrayOf("pidof", packageName))
+            val pid = pidOut.trim()
+            if (pid.isEmpty()) {
+                runOnUiThread {
+                    tvStraceResults.text = "Target app '$packageName' is not currently active.\nLaunch the target app first, then re-tap 'Run Live Trace', or run in root shell:\n\n$currentStraceCmd"
+                    btnRunStrace.isEnabled = true
+                }
+                return@Thread
+            }
+
+            runOnUiThread {
+                tvStraceResults.text = "Attaching strace to PID $pid (tracing execve, mount, umount2, ptrace, kill, capset)…"
+            }
+
+            val (traceOut, traceErr) = ShizukuManager.execShell(
+                arrayOf("su", "-c", "strace -f -e trace=execve,mount,umount2,ptrace,kill,capset -s 256 -p $pid")
+            )
+
+            val rawCombined = if (traceOut.isNotBlank()) traceOut else traceErr
+            val parsed = SyscallTraceParser.parse(rawCombined)
+            val formatted = SyscallTraceParser.format(parsed)
+
+            runOnUiThread {
+                tvStraceResults.text = if (rawCombined.isBlank()) {
+                    "No syscall events recorded during trace on PID $pid."
+                } else {
+                    "Traced Events:\n$formatted\n\nRaw Trace Output:\n${rawCombined.take(2500)}"
+                }
+                btnRunStrace.isEnabled = true
             }
         }.start()
     }

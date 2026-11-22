@@ -1,0 +1,322 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    android:background="#0D0D0D"
+    android:fitsSystemWindows="true">
+
+    <!-- Top Toolbar -->
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="56dp"
+        android:orientation="horizontal"
+        android:gravity="center_vertical"
+        android:paddingStart="8dp"
+        android:paddingEnd="16dp"
+        android:background="#121212">
+
+        <ImageButton
+            android:id="@+id/btnTutorialBack"
+            android:layout_width="44dp"
+            android:layout_height="44dp"
+            android:background="?attr/selectableItemBackgroundBorderless"
+            android:src="@android:drawable/ic_menu_close_clear_cancel"
+            android:tint="#F5F5F5"
+            android:contentDescription="Close" />
+
+        <LinearLayout
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:layout_marginStart="8dp"
+            android:orientation="vertical">
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="DroidLens Setup &amp; Tutorial"
+                android:textColor="#F5F5F5"
+                android:textSize="15sp"
+                android:fontFamily="sans-serif-medium" />
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="KernelSU &amp; Privilege Inspection Guide"
+                android:textColor="#8A8A8A"
+                android:textSize="11sp" />
+        </LinearLayout>
+    </LinearLayout>
+
+    <ScrollView
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="1"
+        android:padding="16dp">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical">
+
+            <!-- Overview Card -->
+            <com.google.android.material.card.MaterialCardView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="14dp"
+                app:cardCornerRadius="16dp"
+                app:cardElevation="0dp"
+                app:cardBackgroundColor="#171717"
+                app:strokeColor="#262626"
+                app:strokeWidth="1dp">
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="vertical"
+                    android:padding="18dp">
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="WHAT'S NEW IN DROIDLENS"
+                        android:textColor="#00E676"
+                        android:textSize="10sp"
+                        android:fontFamily="sans-serif-medium"
+                        android:letterSpacing="0.2" />
+
+                    <TextView
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="6dp"
+                        android:text="Discover Privileges Outside AndroidManifest.xml"
+                        android:textColor="#F5F5F5"
+                        android:textSize="15sp"
+                        android:fontFamily="sans-serif-medium" />
+
+                    <TextView
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="8dp"
+                        android:text="AndroidManifest.xml only declares standard Android permissions (INTERNET, WRITE_SECURE_SETTINGS, etc.). Privileged apps hide their real capabilities (Linux CAP_* capabilities, root shell commands, and mount namespaces) inside compiled DEX bytecode, native .so libraries, and bundled shell scripts.\n\nDroidLens now inspects all three layers and synthesizes an exact least-privilege KernelSU App Profile."
+                        android:textColor="#A0A0A0"
+                        android:textSize="12sp"
+                        android:lineSpacingExtra="3dp" />
+                </LinearLayout>
+            </com.google.android.material.card.MaterialCardView>
+
+            <!-- Card 1: Why DroidLens Needs Root Access -->
+            <com.google.android.material.card.MaterialCardView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="14dp"
+                app:cardCornerRadius="16dp"
+                app:cardElevation="0dp"
+                app:cardBackgroundColor="#171717"
+                app:strokeColor="#FF6A00"
+                app:strokeWidth="1.2dp">
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="vertical"
+                    android:padding="18dp">
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="SECURITY PRIVILEGE REQUIREMENT"
+                        android:textColor="#FF6A00"
+                        android:textSize="10sp"
+                        android:fontFamily="sans-serif-medium"
+                        android:letterSpacing="0.2" />
+
+                    <TextView
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="6dp"
+                        android:text="Why DroidLens Needs Root Privileges"
+                        android:textColor="#F5F5F5"
+                        android:textSize="15sp"
+                        android:fontFamily="sans-serif-medium" />
+
+                    <TextView
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="8dp"
+                        android:text="1. Process Boundaries &amp; Strace: Android's Zygote isolates apps into private UIDs. To attach `strace` or `ptrace` to a running target app and observe what its `su` child process executes (execve, mount, kill), DroidLens requires Linux CAP_SYS_PTRACE.\n\n2. Child Process Visibility: Unprivileged apps cannot monitor syscalls or read /proc/&lt;pid&gt;/ entries of other apps.\n\n3. KernelSU Least Privilege: Rather than asking for unbounded root, DroidLens operates under a strictly scoped profile granting only the capabilities needed to inspect and trace."
+                        android:textColor="#A0A0A0"
+                        android:textSize="12sp"
+                        android:lineSpacingExtra="3dp" />
+                </LinearLayout>
+            </com.google.android.material.card.MaterialCardView>
+
+            <!-- Card 2: KernelSU App Profile for DroidLens -->
+            <com.google.android.material.card.MaterialCardView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="14dp"
+                app:cardCornerRadius="16dp"
+                app:cardElevation="0dp"
+                app:cardBackgroundColor="#171717"
+                app:strokeColor="#00E676"
+                app:strokeWidth="1.5dp">
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="vertical"
+                    android:padding="18dp">
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="KERNELSU PROFILE SETUP"
+                        android:textColor="#00E676"
+                        android:textSize="10sp"
+                        android:fontFamily="sans-serif-medium"
+                        android:letterSpacing="0.2" />
+
+                    <TextView
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="6dp"
+                        android:text="Configure DroidLens in KernelSU Manager"
+                        android:textColor="#F5F5F5"
+                        android:textSize="15sp"
+                        android:fontFamily="sans-serif-medium" />
+
+                    <TextView
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="8dp"
+                        android:text="Apply this profile to DroidLens (com.Cali.droidlens) inside KernelSU Manager to enable full dynamic child tracing and logcat interception:"
+                        android:textColor="#A0A0A0"
+                        android:textSize="12sp"
+                        android:lineSpacingExtra="3dp" />
+
+                    <TextView
+                        android:id="@+id/tvTutorialKsuJson"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="10dp"
+                        android:textColor="#00E676"
+                        android:textSize="11sp"
+                        android:fontFamily="monospace"
+                        android:lineSpacingExtra="2dp"
+                        android:background="#121212"
+                        android:padding="12dp" />
+
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:orientation="horizontal"
+                        android:layout_marginTop="12dp">
+
+                        <com.google.android.material.button.MaterialButton
+                            android:id="@+id/btnCopyTutorialKsuJson"
+                            android:layout_width="0dp"
+                            android:layout_height="40dp"
+                            android:layout_weight="1"
+                            android:layout_marginEnd="6dp"
+                            android:text="Copy Profile JSON"
+                            android:textAllCaps="false"
+                            android:textSize="12sp"
+                            android:textColor="#0D0D0D"
+                            android:fontFamily="sans-serif-medium"
+                            app:backgroundTint="#00E676"
+                            app:cornerRadius="20dp"
+                            app:elevation="0dp" />
+
+                        <com.google.android.material.button.MaterialButton
+                            android:id="@+id/btnOpenKernelSu"
+                            android:layout_width="0dp"
+                            android:layout_height="40dp"
+                            android:layout_weight="1"
+                            android:layout_marginStart="6dp"
+                            android:text="Open KernelSU"
+                            android:textAllCaps="false"
+                            android:textSize="12sp"
+                            android:textColor="#F5F5F5"
+                            android:fontFamily="sans-serif-medium"
+                            app:backgroundTint="#262626"
+                            app:cornerRadius="20dp"
+                            app:elevation="0dp" />
+                    </LinearLayout>
+
+                    <TextView
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="12dp"
+                        android:text="Steps:\n1. Tap 'Copy Profile JSON' above.\n2. Open KernelSU Manager → Superuser list.\n3. Tap DroidLens (com.Cali.droidlens).\n4. Select 'App Profile' / custom profile configuration.\n5. Paste the configuration and save."
+                        android:textColor="#8A8A8A"
+                        android:textSize="11sp"
+                        android:lineSpacingExtra="3dp" />
+                </LinearLayout>
+            </com.google.android.material.card.MaterialCardView>
+
+            <!-- Card 3: Feature Tour -->
+            <com.google.android.material.card.MaterialCardView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="16dp"
+                app:cardCornerRadius="16dp"
+                app:cardElevation="0dp"
+                app:cardBackgroundColor="#171717"
+                app:strokeColor="#262626"
+                app:strokeWidth="1dp">
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="vertical"
+                    android:padding="18dp">
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="FEATURE TOUR"
+                        android:textColor="#F5F5F5"
+                        android:textSize="10sp"
+                        android:fontFamily="sans-serif-medium"
+                        android:letterSpacing="0.2" />
+
+                    <TextView
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="6dp"
+                        android:text="How to Use the New Inspection Tools"
+                        android:textColor="#F5F5F5"
+                        android:textSize="15sp"
+                        android:fontFamily="sans-serif-medium" />
+
+                    <TextView
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="10dp"
+                        android:text="• Bundled Privileged Scripts:\nDroidLens extracts shell scripts from assets/ and res/raw/, highlighting privileged lines (resetprop, iptables, mount, dd, pm grant).\n\n• DEX Root Invocation Scanner:\nScans Dalvik/ART bytecode for root frameworks (libsu, libsuperuser, RootTools) and su execution (ProcessBuilder, Runtime.exec, app_process).\n\n• Native ELF Symbol Inspector:\nWalks dynamic symbol tables (.dynsym) inside .so files to flag kernel syscalls (mount, ptrace, kill, ioctl) and block devices (/dev/block/).\n\n• Live Syscall Trace (strace):\nRuns an attached trace filtering execve and EPERM events when the target app calls su. Use 'Copy Strace Cmd' or tap 'Run Live Trace' with Shizuku/root.\n\n• Export KernelSU Profile:\nSynthesizes all findings into a tailored profile JSON for the target app, complete with capability justifications."
+                        android:textColor="#A0A0A0"
+                        android:textSize="12sp"
+                        android:lineSpacingExtra="4dp" />
+                </LinearLayout>
+            </com.google.android.material.card.MaterialCardView>
+
+            <!-- Done Button -->
+            <com.google.android.material.button.MaterialButton
+                android:id="@+id/btnTutorialGotIt"
+                android:layout_width="match_parent"
+                android:layout_height="48dp"
+                android:layout_marginBottom="24dp"
+                android:text="Got It — Back to Analyzer"
+                android:textAllCaps="false"
+                android:textSize="14sp"
+                android:textColor="#0D0D0D"
+                android:fontFamily="sans-serif-medium"
+                app:backgroundTint="#00E676"
+                app:cornerRadius="24dp"
+                app:elevation="0dp" />
+        </LinearLayout>
+    </ScrollView>
+</LinearLayout>

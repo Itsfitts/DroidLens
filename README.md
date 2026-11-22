@@ -57,6 +57,18 @@ from you: AXML, ARSC, and DEX.
   snapshot and pattern-matches Dart packages (`crypto`, `dio`,
   `flutter_secure_storage`, `webview_flutter`, Firebase) and runtime bridges
   (`dart:ffi`, MethodChannel, `dart:isolate`).
+- **KernelSU & Root Scope Analyzer** — discovers capabilities outside
+  `AndroidManifest.xml` (which only governs baseline Android permissions).
+  Inspects:
+  - Bundled shell scripts in `assets/` and `res/raw/` for privileged binaries
+    (`resetprop`, `iptables`, `mount`, `umount`, `dd`, `pm grant`).
+  - Dalvik/ART bytecode (`classes*.dex`) for root suites (`libsu`, `libsuperuser`,
+    `RootTools`), `ProcessBuilder`, `Runtime.getRuntime().exec`, and `app_process`.
+  - Native ELF `.so` libraries for dynamically imported syscalls (`mount`,
+    `umount2`, `ptrace`, `kill`, `capset`, `ioctl`) and `/dev/block/` devices.
+  - Automatically synthesizes a least-privilege **KernelSU App Profile JSON**
+    (`namespace`, `groups`, `capabilities`) with a technical justification breakdown.
+  - Generates and runs targeted runtime syscall traces (`strace -f -e trace=execve,mount,...`).
 
 ### Static analysis — aggregation
 

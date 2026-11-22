@@ -14,23 +14,52 @@
         android:padding="16dp">
 
         <!-- ============== HEADER ============== -->
-        <TextView
-            android:layout_width="wrap_content"
+        <LinearLayout
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="DroidLens"
-            android:textColor="#F5F5F5"
-            android:textSize="26sp"
-            android:fontFamily="sans-serif-medium"
-            android:letterSpacing="-0.01" />
+            android:orientation="horizontal"
+            android:gravity="center_vertical"
+            android:layout_marginBottom="20dp">
 
-        <TextView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="APK Security Triage"
-            android:textColor="#8A8A8A"
-            android:textSize="13sp"
-            android:layout_marginTop="2dp"
-            android:layout_marginBottom="20dp" />
+            <LinearLayout
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:orientation="vertical">
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="DroidLens"
+                    android:textColor="#F5F5F5"
+                    android:textSize="26sp"
+                    android:fontFamily="sans-serif-medium"
+                    android:letterSpacing="-0.01" />
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="APK Security &amp; Kernel Profiler"
+                    android:textColor="#8A8A8A"
+                    android:textSize="13sp"
+                    android:layout_marginTop="2dp" />
+            </LinearLayout>
+
+            <com.google.android.material.button.MaterialButton
+                android:id="@+id/btnOpenTutorial"
+                android:layout_width="wrap_content"
+                android:layout_height="36dp"
+                android:text="Guide &amp; KSU Setup"
+                android:textAllCaps="false"
+                android:textSize="11sp"
+                android:textColor="#00E676"
+                android:fontFamily="sans-serif-medium"
+                app:backgroundTint="#202020"
+                app:strokeColor="#00E676"
+                app:strokeWidth="1dp"
+                app:cornerRadius="18dp"
+                app:elevation="0dp" />
+        </LinearLayout>
 
         <!-- ============== SELECTED FILE CARD ============== -->
         <com.google.android.material.card.MaterialCardView
@@ -1215,6 +1244,254 @@
                         android:fontFamily="monospace"
                         android:lineSpacingExtra="3dp"
                         android:visibility="gone" />
+                </LinearLayout>
+            </com.google.android.material.card.MaterialCardView>
+
+            <!-- ============ KERNELSU & ROOT SCOPE ============ -->
+            <com.google.android.material.card.MaterialCardView
+                android:id="@+id/cardKernelSu"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="12dp"
+                app:cardCornerRadius="16dp"
+                app:cardElevation="0dp"
+                app:cardBackgroundColor="#171717"
+                app:strokeColor="#00E676"
+                app:strokeWidth="1.5dp">
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="vertical"
+                    android:padding="18dp"
+                    android:animateLayoutChanges="true">
+
+                    <LinearLayout
+                        android:id="@+id/headerKernelSu"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:orientation="horizontal"
+                        android:gravity="center_vertical"
+                        android:clickable="true"
+                        android:focusable="true">
+
+                        <LinearLayout
+                            android:layout_width="0dp"
+                            android:layout_height="wrap_content"
+                            android:layout_weight="1"
+                            android:orientation="vertical">
+
+                            <TextView
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:text="KERNELSU APP PROFILE SCOPE"
+                                android:textColor="#00E676"
+                                android:textSize="10sp"
+                                android:fontFamily="sans-serif-medium"
+                                android:letterSpacing="0.2" />
+
+                            <TextView
+                                android:id="@+id/tvKsuSummary"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:text="Least-privilege child process &amp; capability analysis"
+                                android:textColor="#8A8A8A"
+                                android:textSize="11sp"
+                                android:layout_marginTop="3dp" />
+                        </LinearLayout>
+
+                        <TextView
+                            android:id="@+id/tvKsuToggle"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="▸"
+                            android:textColor="#8A8A8A"
+                            android:textSize="16sp"
+                            android:paddingStart="8dp"
+                            android:paddingEnd="4dp" />
+                    </LinearLayout>
+
+                    <LinearLayout
+                        android:id="@+id/scrollKernelSu"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:orientation="vertical"
+                        android:layout_marginTop="12dp"
+                        android:visibility="gone">
+
+                        <!-- Breakdown rationale -->
+                        <TextView
+                            android:id="@+id/tvKsuBreakdown"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:textColor="#F5F5F5"
+                            android:textSize="11sp"
+                            android:fontFamily="monospace"
+                            android:lineSpacingExtra="3dp"
+                            android:background="#202020"
+                            android:padding="12dp" />
+
+                        <!-- Bundled scripts -->
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_marginTop="14dp"
+                            android:text="BUNDLED PRIVILEGED SCRIPTS (assets / raw)"
+                            android:textColor="#8A8A8A"
+                            android:textSize="10sp"
+                            android:fontFamily="sans-serif-medium"
+                            android:letterSpacing="0.1" />
+
+                        <TextView
+                            android:id="@+id/tvKsuScripts"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:layout_marginTop="4dp"
+                            android:textColor="#D5D5D5"
+                            android:textSize="11sp"
+                            android:fontFamily="monospace"
+                            android:lineSpacingExtra="2dp" />
+
+                        <!-- DEX root calls -->
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_marginTop="14dp"
+                            android:text="DEX ROOT CALLS &amp; FRAMEWORKS"
+                            android:textColor="#8A8A8A"
+                            android:textSize="10sp"
+                            android:fontFamily="sans-serif-medium"
+                            android:letterSpacing="0.1" />
+
+                        <TextView
+                            android:id="@+id/tvKsuDex"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:layout_marginTop="4dp"
+                            android:textColor="#D5D5D5"
+                            android:textSize="11sp"
+                            android:fontFamily="monospace"
+                            android:lineSpacingExtra="2dp" />
+
+                        <!-- Native symbols -->
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_marginTop="14dp"
+                            android:text="NATIVE PRIVILEGED SYMBOLS &amp; DEV NODES (.so)"
+                            android:textColor="#8A8A8A"
+                            android:textSize="10sp"
+                            android:fontFamily="sans-serif-medium"
+                            android:letterSpacing="0.1" />
+
+                        <TextView
+                            android:id="@+id/tvKsuNative"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:layout_marginTop="4dp"
+                            android:textColor="#D5D5D5"
+                            android:textSize="11sp"
+                            android:fontFamily="monospace"
+                            android:lineSpacingExtra="2dp" />
+
+                        <!-- Dynamic Strace Runner -->
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_marginTop="14dp"
+                            android:text="RUNTIME SYSCALL TRACE (strace)"
+                            android:textColor="#8A8A8A"
+                            android:textSize="10sp"
+                            android:fontFamily="sans-serif-medium"
+                            android:letterSpacing="0.1" />
+
+                        <LinearLayout
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:orientation="horizontal"
+                            android:layout_marginTop="6dp">
+
+                            <com.google.android.material.button.MaterialButton
+                                android:id="@+id/btnCopyStraceCmd"
+                                android:layout_width="0dp"
+                                android:layout_height="38dp"
+                                android:layout_weight="1"
+                                android:layout_marginEnd="6dp"
+                                android:text="Copy Strace Cmd"
+                                android:textAllCaps="false"
+                                android:textSize="11sp"
+                                android:textColor="#0D0D0D"
+                                android:fontFamily="sans-serif-medium"
+                                app:backgroundTint="#00E676"
+                                app:cornerRadius="19dp"
+                                app:elevation="0dp" />
+
+                            <com.google.android.material.button.MaterialButton
+                                android:id="@+id/btnRunStrace"
+                                android:layout_width="0dp"
+                                android:layout_height="38dp"
+                                android:layout_weight="1"
+                                android:layout_marginStart="6dp"
+                                android:text="Run Live Trace"
+                                android:textAllCaps="false"
+                                android:textSize="11sp"
+                                android:textColor="#F5F5F5"
+                                android:fontFamily="sans-serif-medium"
+                                app:backgroundTint="#262626"
+                                app:cornerRadius="19dp"
+                                app:elevation="0dp" />
+                        </LinearLayout>
+
+                        <TextView
+                            android:id="@+id/tvStraceResults"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:layout_marginTop="8dp"
+                            android:textColor="#F5F5F5"
+                            android:textSize="11sp"
+                            android:fontFamily="monospace"
+                            android:lineSpacingExtra="2dp"
+                            android:background="#202020"
+                            android:padding="10dp"
+                            android:visibility="gone" />
+
+                        <!-- KernelSU Profile JSON Output -->
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_marginTop="16dp"
+                            android:text="KERNELSU PROFILE JSON"
+                            android:textColor="#8A8A8A"
+                            android:textSize="10sp"
+                            android:fontFamily="sans-serif-medium"
+                            android:letterSpacing="0.1" />
+
+                        <TextView
+                            android:id="@+id/tvKsuJson"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:layout_marginTop="6dp"
+                            android:textColor="#00E676"
+                            android:textSize="11sp"
+                            android:fontFamily="monospace"
+                            android:lineSpacingExtra="2dp"
+                            android:background="#121212"
+                            android:padding="12dp" />
+
+                        <com.google.android.material.button.MaterialButton
+                            android:id="@+id/btnCopyKsuJson"
+                            android:layout_width="match_parent"
+                            android:layout_height="40dp"
+                            android:layout_marginTop="10dp"
+                            android:text="Copy KernelSU Profile JSON"
+                            android:textAllCaps="false"
+                            android:textSize="12sp"
+                            android:textColor="#0D0D0D"
+                            android:fontFamily="sans-serif-medium"
+                            app:backgroundTint="#00E676"
+                            app:cornerRadius="20dp"
+                            app:elevation="0dp" />
+                    </LinearLayout>
                 </LinearLayout>
             </com.google.android.material.card.MaterialCardView>
 

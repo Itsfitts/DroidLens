@@ -301,6 +301,15 @@ object FindingsEngine {
         val target = info.targetSdk.toIntOrNull()
         val min = info.minSdk.toIntOrNull()
 
+        if (target != null && target >= 36) {
+            out.add(Finding(
+                Severity.INFO,
+                "Targets Android 16 (API 36)",
+                "Target SDK is API 36 (Android 16 / Baklava). Enforces modern edge-to-edge rendering, predictive back gesture, and 16 KB page-aligned native runtime.",
+                "Compatibility"
+            ))
+        }
+
         if (target != null && target < 30) {
             out.add(Finding(
                 Severity.MEDIUM,
@@ -315,6 +324,17 @@ object FindingsEngine {
                 Severity.LOW,
                 "Minimum SDK below 21",
                 "Min SDK is API $min. Very old baseline; the app may not be actively maintained.",
+                "Compatibility"
+            ))
+        }
+    }
+
+    fun check16KbPageAlignment(non16KbLibs: List<String>, out: MutableList<Finding>) {
+        if (non16KbLibs.isNotEmpty()) {
+            out.add(Finding(
+                Severity.HIGH,
+                "Android 16 Incompatible: 16 KB Page Alignment Missing",
+                "${non16KbLibs.size} 64-bit native library(ies) lack 16 KB page alignment: ${non16KbLibs.take(4).joinToString(", ")}. These will crash with SIGSEGV or fail to load on Android 16 devices with 16 KB page sizes.",
                 "Compatibility"
             ))
         }

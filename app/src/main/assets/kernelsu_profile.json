@@ -1,0 +1,24 @@
+[
+  {
+    "id": "com.Cali.droidlens",
+    "name": "DroidLens Security & Kernel Profiler",
+    "description": "Least-privilege profile granting process tracing, child execve inspection, and logcat extraction for APK dynamic strace profiling and privilege auditing.",
+    "author": "DroidLens",
+    "namespace": "GLOBAL",
+    "uid": 0,
+    "gid": 0,
+    "groups": [
+      "ROOT",
+      "SYSTEM",
+      "SHELL"
+    ],
+    "capabilities": [
+      "CAP_SYS_PTRACE",
+      "CAP_KILL",
+      "CAP_DAC_READ_SEARCH",
+      "CAP_SYS_ADMIN"
+    ],
+    "context": "u:r:ksu:s0",
+    "flags": []
+  }
+]
