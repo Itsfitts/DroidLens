@@ -111,29 +111,49 @@
                 <LinearLayout
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:orientation="horizontal"
+                    android:orientation="vertical"
                     android:layout_marginTop="16dp">
 
-                    <com.google.android.material.button.MaterialButton
-                        android:id="@+id/btnPickApk"
-                        android:layout_width="0dp"
-                        android:layout_height="46dp"
-                        android:layout_weight="1"
-                        android:text="Pick APK"
-                        android:textAllCaps="false"
-                        android:textSize="14sp"
-                        android:textColor="#0D0D0D"
-                        android:fontFamily="sans-serif-medium"
-                        app:backgroundTint="#F5F5F5"
-                        app:cornerRadius="23dp"
-                        app:elevation="0dp" />
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:orientation="horizontal">
+
+                        <com.google.android.material.button.MaterialButton
+                            android:id="@+id/btnPickApk"
+                            android:layout_width="0dp"
+                            android:layout_height="46dp"
+                            android:layout_weight="1"
+                            android:text="Pick File"
+                            android:textAllCaps="false"
+                            android:textSize="13sp"
+                            android:textColor="#0D0D0D"
+                            android:fontFamily="sans-serif-medium"
+                            app:backgroundTint="#F5F5F5"
+                            app:cornerRadius="23dp"
+                            app:elevation="0dp" />
+
+                        <com.google.android.material.button.MaterialButton
+                            android:id="@+id/btnPickInstalledApp"
+                            android:layout_width="0dp"
+                            android:layout_height="46dp"
+                            android:layout_weight="1"
+                            android:layout_marginStart="8dp"
+                            android:text="Select App"
+                            android:textAllCaps="false"
+                            android:textSize="13sp"
+                            android:textColor="#0D0D0D"
+                            android:fontFamily="sans-serif-medium"
+                            app:backgroundTint="#F5F5F5"
+                            app:cornerRadius="23dp"
+                            app:elevation="0dp" />
+                    </LinearLayout>
 
                     <com.google.android.material.button.MaterialButton
                         android:id="@+id/btnAnalyze"
-                        android:layout_width="0dp"
+                        android:layout_width="match_parent"
                         android:layout_height="46dp"
-                        android:layout_weight="1"
-                        android:layout_marginStart="8dp"
+                        android:layout_marginTop="8dp"
                         android:text="Analyze"
                         android:textAllCaps="false"
                         android:textSize="14sp"

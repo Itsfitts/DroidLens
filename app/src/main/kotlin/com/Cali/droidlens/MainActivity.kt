@@ -217,6 +217,36 @@ class MainActivity : AppCompatActivity() {
             pickApkLauncher.launch(intent)
         }
 
+        findViewById<Button>(R.id.btnPickInstalledApp).setOnClickListener {
+            InstalledAppPickerDialog(this) { app ->
+                JadxHolder.release()
+                cacheDir.listFiles()?.forEach { f ->
+                    if (f.name.startsWith("target_") && f.name.endsWith(".apk")) {
+                        f.delete()
+                    }
+                }
+
+                val temp = File(cacheDir, "target_${app.packageName}.apk")
+                try {
+                    File(app.apkPath).inputStream().use { input ->
+                        FileOutputStream(temp).use { out -> input.copyTo(out) }
+                    }
+                    selectedApk = temp
+                    tvFileName.text = "${app.appName} (${app.packageName})"
+                    val kb = temp.length() / 1024.0
+                    val mb = kb / 1024.0
+                    val sizeText = if (mb >= 1) "%.2f MB".format(mb) else "%.1f KB".format(kb)
+                    tvFileMeta.text = "$sizeText  ·  Installed App ready to analyze"
+                    btnAnalyze.isEnabled = true
+                    resultsContainer.visibility = View.GONE
+                    tvStatus.visibility = View.GONE
+                } catch (e: Exception) {
+                    tvStatus.text = "Copy failed: ${e.message}"
+                    tvStatus.visibility = View.VISIBLE
+                }
+            }.show()
+        }
+
         btnAnalyze.setOnClickListener {
             val apk = selectedApk ?: return@setOnClickListener
             runAnalysis(apk)
@@ -630,11 +660,11 @@ val scriptSummary = try {
 val elfSummary = try {
     ElfSymbolParser.scan(apk)
 } catch (e: Throwable) {
-    ElfSymbolParser.Summary(emptyList(), 0, emptySet(), emptySet(), e.message)
+    ElfSymbolParser.Summary(emptyList(), 0, emptySet(), emptySet(), error = e.message)
 }
 
 val dexRootSummary = try {
-    DexRootScanner.scan(apk, secrets.strings.ifEmpty { null })
+    DexRootScanner.scan(apk)
 } catch (e: Throwable) {
     DexRootScanner.Summary(emptyList(), emptyList(), emptyList(), emptySet(), e.message)
 }

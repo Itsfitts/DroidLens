@@ -6,6 +6,14 @@ plugins {
 }
 
 android {
+    signingConfigs {
+        create("release") {
+            storeFile = file("C:\\Users\\itsfi\\Documents\\GitHub\\itsfitts.jks")
+            storePassword = "33275377"
+            keyAlias = "itsfitts"
+            keyPassword = "K.dot.Fitts!1903@"
+        }
+    }
     namespace = "com.Cali.droidlens"
     compileSdk = 36
 
